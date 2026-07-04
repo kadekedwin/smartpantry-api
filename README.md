@@ -30,6 +30,7 @@ npm run dev
 | `JWT_SECRET` | insecure dev fallback | **Set this in production** |
 | `JWT_EXPIRES_IN` | `7d` | JWT lifetime |
 | `DB_PATH` | `./data/smartpantry.db` | SQLite file path |
+| `UPLOADS_DIR` | `./data/uploads` | Directory where uploaded inventory images are stored. Served at `/uploads/*`. |
 
 ## Auth
 
@@ -73,10 +74,15 @@ curl -s -X POST http://localhost:3000/v1/auth/register \
 # save the token from the response
 TOKEN=...
 
-# add an inventory item
+# add an inventory item (multipart, image is an uploaded file)
 curl -s -X POST http://localhost:3000/v1/inventory \
-  -H "Authorization: Bearer $TOKEN" -H 'Content-Type: application/json' \
-  -d '{"name":"Wortel","icon":"🥕","stock":5,"unit":"biji","expired_at":"2026-07-08","category":"kulkas"}'
+  -H "Authorization: Bearer $TOKEN" \
+  -F "name=Wortel" \
+  -F "image=@./wortel.png" \
+  -F "stock=5" \
+  -F "unit=biji" \
+  -F "expired_at=2026-07-08" \
+  -F "category=kulkas"
 
 # list inventory
 curl -s http://localhost:3000/v1/inventory -H "Authorization: Bearer $TOKEN"

@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 
+const { uploadsDir } = require('./utils/uploads');
 const authRoutes = require('./routes/auth');
 const profileRoutes = require('./routes/profile');
 const inventoryRoutes = require('./routes/inventory');
@@ -14,6 +15,7 @@ const app = express();
 app.use(cors());
 app.use(express.json({ limit: '1mb' }));
 app.use(requestLogger);
+app.use('/uploads', express.static(uploadsDir));
 
 app.get('/health', (req, res) => res.json({ data: { status: 'ok' }, message: 'OK' }));
 

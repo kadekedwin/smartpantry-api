@@ -132,7 +132,7 @@ Fetch pantry items. Used by `InventoryTab` to display items per storage category
     {
       "id": "inv_01",
       "name": "Sawi Hijau",
-      "icon": "🥬",
+      "image": "https://api.smartpantry.com/uploads/1730000000000-a1b2c3d4e5f6.png",
       "stock": 2,
       "unit": "ikat",
       "expired_at": "2026-07-06",
@@ -141,7 +141,7 @@ Fetch pantry items. Used by `InventoryTab` to display items per storage category
     {
       "id": "inv_02",
       "name": "Daging Sapi",
-      "icon": "🥩",
+      "image": "https://api.smartpantry.com/uploads/1730000000001-f6e5d4c3b2a1.jpg",
       "stock": 1,
       "unit": "kg",
       "expired_at": "2026-08-02",
@@ -157,6 +157,8 @@ Fetch pantry items. Used by `InventoryTab` to display items per storage category
 > - ≤ 5 days → yellow
 > - \> 5 days → green
 
+> `image` is an absolute URL pointing at the uploaded file. Uploads are served from the API root (`/uploads/...`), not under `/v1`.
+
 ---
 
 ### POST `/inventory`
@@ -165,28 +167,30 @@ Fetch pantry items. Used by `InventoryTab` to display items per storage category
 
 Add a new item to the pantry. Used by the "Input Langsung" tab inside `AddTab`.
 
-**Request**
-```json
-{
-  "name": "Wortel Segar",
-  "icon": "🥕",
-  "stock": 5,
-  "unit": "biji",
-  "expired_at": "2026-07-08",
-  "category": "kulkas"
-}
-```
+**Content-Type:** `multipart/form-data`
 
-**Field rules**
+**Request (form fields)**
 
 | Field | Type | Required | Notes |
 |-------|------|----------|-------|
-| `name` | string | Yes | |
-| `icon` | string | Yes | Single emoji character |
-| `stock` | integer | Yes | Must be > 0 |
-| `unit` | string | Yes | e.g. `kg`, `biji`, `ikat`, `liter`, `bungkus` |
-| `expired_at` | string | Yes | ISO date `YYYY-MM-DD` |
-| `category` | string | Yes | `kulkas` \| `freezer` \| `rak_dapur` |
+| `name` | text | Yes | |
+| `image` | file | Yes | Uploaded file. `png`, `jpeg`, `webp`, or `gif`. Max 5 MB. |
+| `stock` | text (integer) | Yes | Must be > 0 |
+| `unit` | text | Yes | e.g. `kg`, `biji`, `ikat`, `liter`, `bungkus` |
+| `expired_at` | text | Yes | ISO date `YYYY-MM-DD` |
+| `category` | text | Yes | `kulkas` \| `freezer` \| `rak_dapur` |
+
+**Example (curl)**
+```bash
+curl -X POST https://api.smartpantry.com/v1/inventory \
+  -H "Authorization: Bearer $TOKEN" \
+  -F "name=Wortel Segar" \
+  -F "image=@./wortel.png" \
+  -F "stock=5" \
+  -F "unit=biji" \
+  -F "expired_at=2026-07-08" \
+  -F "category=kulkas"
+```
 
 **Response `201`**
 ```json
@@ -194,7 +198,7 @@ Add a new item to the pantry. Used by the "Input Langsung" tab inside `AddTab`.
   "data": {
     "id": "inv_03",
     "name": "Wortel Segar",
-    "icon": "🥕",
+    "image": "https://api.smartpantry.com/uploads/1730000000002-abc123def456.png",
     "stock": 5,
     "unit": "biji",
     "expired_at": "2026-07-08",
@@ -203,6 +207,8 @@ Add a new item to the pantry. Used by the "Input Langsung" tab inside `AddTab`.
   "message": "Item added"
 }
 ```
+
+> The server saves the file under `data/uploads/` and returns its absolute URL in `image` — the client can render it directly.
 
 ---
 

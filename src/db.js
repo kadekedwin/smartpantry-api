@@ -23,7 +23,7 @@ db.exec(`
     id TEXT PRIMARY KEY,
     user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     name TEXT NOT NULL,
-    icon TEXT NOT NULL,
+    image TEXT NOT NULL,
     stock INTEGER NOT NULL,
     unit TEXT NOT NULL,
     expired_at TEXT NOT NULL,
@@ -68,5 +68,10 @@ db.exec(`
     value INTEGER NOT NULL DEFAULT 0
   );
 `);
+
+const inventoryColumns = db.prepare("PRAGMA table_info(inventory)").all();
+if (inventoryColumns.some((c) => c.name === 'icon')) {
+  db.exec('ALTER TABLE inventory RENAME COLUMN icon TO image');
+}
 
 module.exports = db;
